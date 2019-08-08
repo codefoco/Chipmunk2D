@@ -7,14 +7,12 @@
 //TODO: Move all the thread stuff to another file
 
 //#include <sys/param.h >
-
-#ifdef __APPLE__
-#include <sys/sysctl.h>
-#endif
-
 #ifndef _WIN32
-#include <pthread.h>
-#elif defined(__MINGW32__)
+#if __ANDROID__
+	#include <linux/sysctl.h>
+#else
+	#include <sys/sysctl.h>
+#endif
 #include <pthread.h>
 #else
 #ifndef WIN32_LEAN_AND_MEAN
@@ -68,6 +66,7 @@ int pthread_cond_destroy(pthread_cond_t* cv)
 
 int pthread_cond_init(pthread_cond_t* cv, const pthread_condattr_t* attr)
 {
+    (void)(attr);
 	// Initialize the count to 0.
 	cv->waiters_count = 0;
 
@@ -153,6 +152,7 @@ typedef struct {} pthread_mutexattr_t; //< Dummy
 
 int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr)
 {
+    (void)(attr);
 	InitializeCriticalSection(mutex);
 	return 0;
 }
@@ -195,6 +195,7 @@ unsigned int __stdcall ThreadProc(void* userdata)
 
 int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void *(*start_routine) (void *), void *arg)
 {
+    (void)(attr);
 	pthread_internal_thread* ud = (pthread_internal_thread*) malloc(sizeof(pthread_internal_thread));
 	ud->start_routine = start_routine;
 	ud->arg = arg;
@@ -208,6 +209,7 @@ int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void *(*start_
 
 int pthread_join(pthread_t thread, void **value_ptr)
 {
+    (void)(value_ptr);
 	WaitForSingleObject(thread, INFINITE);
 	CloseHandle(thread);
 
@@ -217,12 +219,11 @@ int pthread_join(pthread_t thread, void **value_ptr)
 #endif
 
 #include "chipmunk/chipmunk_private.h"
-#include "chipmunk/cpHastySpace.h"
 
 
 //MARK: ARM NEON Solver
 
-#if __ARM_NEON__
+#if defined(__ARM_HAVE_NEON) || __ARM_NEON__
 #include <arm_neon.h>
 
 // Tested and known to work fine with Clang 3.0 and GCC 4.2
@@ -232,7 +233,7 @@ int pthread_join(pthread_t thread, void **value_ptr)
 #endif
 
 #if CP_USE_DOUBLES
-	#if !__arm64
+	#if !defined(__arm64) && !defined(__aarch64__)
 		#error Cannot use CP_USE_DOUBLES on 32 bit ARM.
 	#endif
 	
@@ -471,6 +472,8 @@ RunWorkers(cpHastySpace *hasty, cpHastySpaceWorkFunction func)
 static void
 Solver(cpSpace *space, unsigned long worker, unsigned long worker_count)
 {
+	(void)(worker);
+	
 	cpArray *constraints = space->constraints;
 	cpArray *arbiters = space->arbiters;
 	

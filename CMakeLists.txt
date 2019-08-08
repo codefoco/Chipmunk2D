@@ -1,67 +1,152 @@
-cmake_minimum_required(VERSION 3.7)
+# Changed by Vinicius Jarina (viniciusjarina@gmail.com)
 
-project(chipmunk)
+PROJECT (chipmunk)
 
-# to change the prefix, run cmake with the parameter:
-#   -D CMAKE_INSTALL_PREFIX=/my/prefix
+CMAKE_MINIMUM_REQUIRED ( VERSION 3.7 )
 
-# to change the build type, run cmake with the parameter:
-#   -D CMAKE_BUILD_TYPE=<build-type>
-# run "cmake --help-variable CMAKE_BUILD_TYPE" for details
-if(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING
-      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
-endif()
+IF (CMAKE_SIZEOF_VOID_P EQUAL 8)
+	SET (LIB_SUFFIX "64" CACHE STRING "Suffix of the directory name, e.g. 64 for lib64")
+ELSE (CMAKE_SIZEOF_VOID_P EQUAL 8)
+	SET (LIB_SUFFIX "" CACHE STRING "Suffix of the directory name, e.g. 64 for lib64")
+ENDIF (CMAKE_SIZEOF_VOID_P EQUAL 8)
 
-# to manually select install locations of libraries and executables
-#   -D LIB_INSTALL_DIR mylib
-#   -D BIN_INSTALL_DIR newbin
-set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")
-set(BIN_INSTALL_DIR bin CACHE STRING "Install location of executables")
+# Chipmunk2D 7.0.3
+SET(CHIPMUNK_VERSION_MAJOR 7)
+SET(CHIPMUNK_VERSION_MINOR 0)
+SET(CHIPMUNK_VERSION_PATCH 3)
 
-# other options for the build, you can i.e. activate the shared library by passing
-#   -D BUILD_SHARED=ON
-# to cmake. Other options analog
-if(ANDROID)
-  option(BUILD_DEMOS "Build the demo applications" OFF)
-  option(INSTALL_DEMOS "Install the demo applications" OFF)
-  option(BUILD_SHARED "Build and install the shared library" ON)
-  option(BUILD_STATIC "Build as static library" ON)
-  option(INSTALL_STATIC "Install the static library" OFF)
-else()
-  option(BUILD_DEMOS "Build the demo applications" ON)
-  option(INSTALL_DEMOS "Install the demo applications" OFF)
-  option(BUILD_SHARED "Build and install the shared library" ON)
-  option(BUILD_STATIC "Build as static library" ON)
-  option(INSTALL_STATIC "Install the static library" ON)
-endif()
+SET(CHIPMUNK_VERSION "${CHIPMUNK_VERSION_MAJOR}.${CHIPMUNK_VERSION_MINOR}.${CHIPMUNK_VERSION_PATCH}")
+MESSAGE("Configuring Chipmunk2D version ${CHIPMUNK_VERSION}")
 
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-  option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
-endif()
+IF(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  OPTION(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
+ENDIF()
 
-# sanity checks...
-if(INSTALL_DEMOS)
-  set(BUILD_DEMOS ON FORCE)
-endif()
+SET (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-# these need the static lib too
-if(BUILD_DEMOS OR INSTALL_STATIC)
-  set(BUILD_STATIC ON FORCE)
-endif()
 
-if(NOT MSVC)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
-  if(FORCE_CLANG_BLOCKS)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
-  endif()
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffast-math") # extend release-profile with fast-math
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # extend debug-profile with -Wall
-endif()
 
-add_subdirectory(src)
+IF (APPLE)
+  SET(SKIP_BUILD_RPATH, TRUE)
+  SET(CMAKE_MACOSX_RPATH 1)
+ENDIF ()
 
-if(BUILD_DEMOS)
-  add_subdirectory(demo)
-endif()
+SET(CMAKE_DEBUG_POSTFIX "d")
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX}" CACHE STRING "Library build output directory")
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib${LIB_SUFFIX}")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin${LIB_SUFFIX}")
+SET(EXECUTABLE_OUTPUT_PATH         "${CMAKE_BINARY_DIR}/bin${LIB_SUFFIX}")
+
+#
+# Include dir COPY
+# If the source dir and the binary dir are not equals,
+# copy the content of libzond/cinlude to $/include
+# 
+IF(NOT ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+	SET(TEMP_INCLUDE_CHIPMUNK_DIR_FROM "${PROJECT_SOURCE_DIR}/include")
+	SET(TEMP_INCLUDE_CHIPMUNK_DIR_TO   "${PROJECT_BINARY_DIR}")
+	MESSAGE(STATUS "Copying include dirs from  ${TEMP_INCLUDE_CHIPMUNK_DIR_FROM} to ${TEMP_INCLUDE_CHIPMUNK_DIR_TO}")
+	FILE ( COPY ${TEMP_INCLUDE_CHIPMUNK_DIR_FROM} DESTINATION ${TEMP_INCLUDE_CHIPMUNK_DIR_TO})
+ENDIF()
+
+# Sources and headers
+INCLUDE_DIRECTORIES (include)
+SET (SRC_LIB 
+		src/chipmunk.c
+		src/cpArbiter.c
+		src/cpArray.c
+		src/cpBBTree.c
+		src/cpBody.c
+		src/cpCollision.c
+		src/cpConstraint.c
+		src/cpDampedRotarySpring.c
+		src/cpDampedSpring.c
+		src/cpGearJoint.c
+		src/cpGrooveJoint.c
+		src/cpHashSet.c
+		src/cpHastySpace.c
+		src/cpMarch.c
+		src/cpPinJoint.c
+		src/cpPivotJoint.c
+		src/cpPolyline.c
+		src/cpPolyShape.c
+		src/cpRatchetJoint.c
+		src/cpRobust.c
+		src/cpRotaryLimitJoint.c
+		src/cpShape.c
+		src/cpSimpleMotor.c
+		src/cpSlideJoint.c
+		src/cpSpace.c
+		src/cpSpaceComponent.c
+		src/cpSpaceDebug.c
+		src/cpSpaceHash.c
+		src/cpSpaceQuery.c
+		src/cpSpaceStep.c
+		src/cpSpatialIndex.c
+		src/cpSweep1D.c
+		)
+
+ADD_DEFINITIONS (-DNDEBUG)
+
+IF (MSVC)
+	SET_SOURCE_FILES_PROPERTIES(${SRC_LIB} PROPERTIES LANGUAGE CXX)
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /W4 /WX")
+	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /W4 /WX")
+	SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /MT /W4 /WX")
+	SET(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_DEBUG} /MT /W4 /WX")
+ELSE()
+	SET_SOURCE_FILES_PROPERTIES(${SRC_LIB} PROPERTIES LANGUAGE C)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
+	IF(FORCE_CLANG_BLOCKS)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
+	ENDIF()
+	SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffast-math -Wall -Werror") # extend release-profile with fast-math
+	SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # extend debug-profile with -Wall
+ENDIF()
+
+# Add extra rc files to the windows build
+IF ( MSVC OR MINGW )
+	SET ( CHIPMUNK_DLL_RC src/chipmunk.rc )
+ENDIF ()
+
+
+## BUILD
+# Create dynamic library (dll, so)
+
+ADD_LIBRARY ( libchipmunk SHARED ${SRC_LIB} ${CHIPMUNK_DLL_RC})
+
+# $ORIGIN support in rpath.
+IF (UNIX AND NOT APPLE)
+    SET (USE_RPATH_ORIGIN TRUE)
+		SET (CMAKE_INSTALL_RPATH "\$ORIGIN/../lib${LIB_SUFFIX}")
+		TARGET_LINK_LIBRARIES(libchipmunk m)
+ENDIF ()
+
+IF (MSVC)
+	# Tell MSVC to compile the code as C++.
+	SET_TARGET_PROPERTIES(libchipmunk PROPERTIES LINKER_LANGUAGE CXX)
+	TARGET_COMPILE_OPTIONS(libchipmunk PRIVATE /W4	/WX)
+ELSE()
+TARGET_COMPILE_OPTIONS(libchipmunk PRIVATE -ffast-math -Wall
+	-Wextra
+	-Wpedantic
+	-Werror)
+ENDIF()
+
+TARGET_LINK_LIBRARIES ( libchipmunk ${LIBS} )
+SET_TARGET_PROPERTIES ( libchipmunk PROPERTIES OUTPUT_NAME chipmunk CLEAN_DIRECT_OUTPUT 1 )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${PROJECT_BINARY_DIR}/bin${LIB_SUFFIX} )
+
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/bin${LIB_SUFFIX} )
+
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PROJECT_BINARY_DIR}/bin${LIB_SUFFIX} )
+
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/lib${LIB_SUFFIX} )
+SET_TARGET_PROPERTIES(  libchipmunk PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/bin${LIB_SUFFIX} )

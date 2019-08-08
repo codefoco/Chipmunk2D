@@ -163,6 +163,11 @@ CP_EXPORT void cpBodyApplyImpulseAtWorldPoint(cpBody *body, cpVect impulse, cpVe
 /// Apply an impulse to a body. Both the impulse and point are expressed in body local coordinates.
 CP_EXPORT void cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point);
 
+/// Get the Default function to update the velocity
+CP_EXPORT cpBodyVelocityFunc cpBodyGetDefaultVelocityUpdateFunc();
+/// Get the Default function to update the position
+CP_EXPORT cpBodyPositionFunc cpBodyGetDefaultPositionUpdateFunc();
+
 /// Get the velocity on a body (in world units) at a point on the body in world coordinates.
 CP_EXPORT cpVect cpBodyGetVelocityAtWorldPoint(const cpBody *body, cpVect point);
 /// Get the velocity on a body (in world units) at a point on the body in local coordinates.

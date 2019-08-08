@@ -128,16 +128,16 @@ cpBodyActivate(cpBody *body)
 			cpAssertSoft(cpBodyGetType(root) == CP_BODY_TYPE_DYNAMIC, "Internal Error: Non-dynamic body component root detected.");
 			
 			cpSpace *space = root->space;
-			cpBody *body = root;
-			while(body){
-				cpBody *next = body->sleeping.next;
+			cpBody *b = root;
+			while(b){
+				cpBody *next = b->sleeping.next;
 				
-				body->sleeping.idleTime = 0.0f;
-				body->sleeping.root = NULL;
-				body->sleeping.next = NULL;
-				cpSpaceActivateBody(space, body);
+				b->sleeping.idleTime = 0.0f;
+				b->sleeping.root = NULL;
+				b->sleeping.next = NULL;
+				cpSpaceActivateBody(space, b);
 				
-				body = next;
+				b = next;
 			}
 			
 			cpArrayDeleteObj(space->sleepingComponents, root);

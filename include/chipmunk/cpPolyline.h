@@ -6,7 +6,7 @@
 // cpPolyline structs are intended to be passed by value and destroyed when you are done with them.
 typedef struct cpPolyline {
   int count, capacity;
-  cpVect verts[];
+  cpVect* verts;
 } cpPolyline;
 
 /// Destroy and free a polyline instance.

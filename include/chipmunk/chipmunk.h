@@ -119,11 +119,14 @@ typedef struct cpSpace cpSpace;
 
 #include "cpBody.h"
 #include "cpShape.h"
+#include "cpPolyline.h"
 #include "cpPolyShape.h"
 
 #include "cpConstraint.h"
 
 #include "cpSpace.h"
+#include "cpHastySpace.h"
+#include "cpMarch.h"
 
 // Chipmunk 7.0.3
 #define CP_VERSION_MAJOR 7

@@ -482,7 +482,7 @@ MarkSubtree(Node *subtree, MarkContext *context)
 //MARK: Leaf Functions
 
 static Node *
-LeafNew(cpBBTree *tree, void *obj, cpBB bb)
+LeafNew(cpBBTree *tree, void *obj)
 {
 	Node *node = NodeFromPool(tree);
 	node->obj = obj;
@@ -516,7 +516,14 @@ LeafUpdate(Node *leaf, cpBBTree *tree)
 	}
 }
 
-static cpCollisionID VoidQueryFunc(void *obj1, void *obj2, cpCollisionID id, void *data){return id;}
+static cpCollisionID VoidQueryFunc(void *obj1, void *obj2, cpCollisionID id, void *data)
+{
+	(void)(obj1);
+	(void)(obj2);
+	(void)(data);
+	
+	return id;
+}
 
 static void
 LeafAddPairs(Node *leaf, cpBBTree *tree)
@@ -553,7 +560,7 @@ leafSetEql(void *obj, Node *node)
 static void *
 leafSetTrans(void *obj, cpBBTree *tree)
 {
-	return LeafNew(tree, obj, tree->spatialIndex.bbfunc(obj));
+	return LeafNew(tree, obj);
 }
 
 cpSpatialIndex *

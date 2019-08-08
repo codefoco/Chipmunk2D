@@ -35,7 +35,12 @@ cpSpaceGetPostStepCallback(cpSpace *space, void *key)
 	return NULL;
 }
 
-static void PostStepDoNothing(cpSpace *space, void *obj, void *data){}
+static void PostStepDoNothing(cpSpace *space, void *obj, void *data)
+{
+	(void)(space);
+	(void)(obj);
+	(void)(data);
+}
 
 cpBool
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
@@ -69,7 +74,6 @@ void
 cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 {
 	space->locked--;
-	cpAssertHard(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
 	if(space->locked == 0){
 		cpArray *waking = space->rousedBodies;
@@ -329,6 +333,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
  void
 cpShapeUpdateFunc(cpShape *shape, void *unused)
 {
+	(void)(unused);
+
 	cpShapeCacheBB(shape);
 }
 

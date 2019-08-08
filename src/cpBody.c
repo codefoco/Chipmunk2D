@@ -89,7 +89,10 @@ cpBodyNewStatic()
 	return body;
 }
 
-void cpBodyDestroy(cpBody *body){}
+void cpBodyDestroy(cpBody *body)
+{
+	(void)(body);
+}
 
 void
 cpBodyFree(cpBody *body)
@@ -488,6 +491,18 @@ void
 cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc)
 {
 	body->position_func = positionFunc;
+}
+
+cpBodyVelocityFunc 
+cpBodyGetDefaultVelocityUpdateFunc()
+{
+	return cpBodyUpdateVelocity;
+}
+
+cpBodyPositionFunc 
+cpBodyGetDefaultPositionUpdateFunc()
+{
+	return cpBodyUpdatePosition;
 }
 
 void

@@ -32,7 +32,7 @@ void
 cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...)
 {
 	fprintf(stderr, (isError ? "Aborting due to Chipmunk error: " : "Chipmunk warning: "));
-	
+	(void)(isHardError);
 	va_list vargs;
 	va_start(vargs, message); {
 #if defined(ANDROID)
@@ -92,6 +92,7 @@ cpFloat
 cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset, cpFloat r)
 {
 	// TODO account for radius.
+	(void)(r);
 	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1], 0.0f);
 	
 	cpFloat sum1 = 0.0f;
@@ -292,7 +293,11 @@ void cpSpaceEachConstraint_b(cpSpace *space, void (^block)(cpConstraint *constra
 	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)IteratorFunc, block);
 }
 
-static void BodyIteratorFunc(cpBody *body, void *ptr, void (^block)(void *ptr)){block(ptr);}
+static void BodyIteratorFunc(cpBody *body, void *ptr, void (^block)(void *ptr))
+{
+	body = NULL;
+	block(ptr);
+}
 
 void cpBodyEachShape_b(cpBody *body, void (^block)(cpShape *shape)){
 	cpBodyEachShape(body, (cpBodyShapeIteratorFunc)BodyIteratorFunc, block);

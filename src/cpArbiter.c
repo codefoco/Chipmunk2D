@@ -151,7 +151,6 @@ cpArbiterTotalImpulse(const cpArbiter *arb)
 	}
 		
 	return (arb->swapped ? sum : cpvneg(sum));
-	return cpvzero;
 }
 
 cpFloat

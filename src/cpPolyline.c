@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "chipmunk/chipmunk_private.h"
-#include "chipmunk/cpPolyline.h"
 
 
 static inline int Next(int i, int count){return (i+1)%count;}
@@ -561,7 +560,11 @@ FindSteiner(int count, cpVect *verts, struct Notch notch)
 static struct Notch
 DeepestNotch(int count, cpVect *verts, int hullCount, cpVect *hullVerts, int first, cpFloat tol)
 {
-	struct Notch notch = {};
+	(void)(tol);
+	
+	struct Notch notch;
+    notch.d = CPFLOAT_MIN;
+
 	int j = Next(first, count);
 	
 	for(int i=0; i<hullCount; i++){
