@@ -21,6 +21,8 @@ watchos: ./watchos/libchipmunk.framework/libchipmunk
 tvos: ./tvos/libchipmunk.framework/libchipmunk
 ./tvos/libchipmunk.framework/libchipmunk:
 	xcodebuild  -project chipmunk.tvos.xcodeproj -configuration Release -sdk appletvsimulator
+	# Xcode 12 has a bug where it adds arm64 to appletv simulator
+	./fix_tvos.sh
 	xcodebuild  -project chipmunk.tvos.xcodeproj  -configuration Release -sdk appletvos
 	ditto ./Build/Release-appletvos/ ./tvos/
 	rm ./tvos/libchipmunk.framework/libchipmunk
