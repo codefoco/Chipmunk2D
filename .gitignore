@@ -53,3 +53,5 @@ msvc/vc14/demo/x64/
 win-x64/
 win-x86/
 android_build/obj/
+osx-64
+osx-arm64
