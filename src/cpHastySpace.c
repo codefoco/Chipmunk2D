@@ -8,10 +8,10 @@
 
 //#include <sys/param.h >
 #ifndef _WIN32
-#if __ANDROID__
-	#include <linux/sysctl.h>
-#else
+#if __APPLE__
 	#include <sys/sysctl.h>
+#else
+	#include <linux/sysctl.h>
 #endif
 #include <pthread.h>
 #else
