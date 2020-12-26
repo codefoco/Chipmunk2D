@@ -69,7 +69,11 @@ cpHandleRelease(cpHandle *hand, cpArray *pooledHandles)
 	if(hand->retain == 0) cpArrayPush(pooledHandles, hand);
 }
 
-static int handleSetEql(void *obj, cpHandle *hand){return (obj == hand->obj);}
+static cpBool handleSetEql(void *obj, const void *elt)
+{
+	cpHandle * hand = (cpHandle *)elt;
+	return (obj == hand->obj);
+}
 
 static void *
 handleSetTrans(void *obj, cpSpaceHash *hash)
