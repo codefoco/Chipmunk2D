@@ -568,9 +568,10 @@ cpSpaceHashCount(cpSpaceHash *hash)
 	return cpHashSetCount(hash->handleSet);
 }
 
-static int
-cpSpaceHashContains(cpSpaceHash *hash, void *obj, cpHashValue hashid)
+static cpBool
+cpSpaceHashContains(cpSpatialIndex *index, void *obj, cpHashValue hashid)
 {
+	cpSpaceHash *hash = (cpSpaceHash *)index;
 	return cpHashSetFind(hash->handleSet, hashid, obj) != NULL;
 }
 
