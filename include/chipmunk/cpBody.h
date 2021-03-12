@@ -158,6 +158,12 @@ CP_EXPORT void cpBodyApplyForceAtWorldPoint(cpBody *body, cpVect force, cpVect p
 /// Apply a force to a body. Both the force and point are expressed in body local coordinates.
 CP_EXPORT void cpBodyApplyForceAtLocalPoint(cpBody *body, cpVect force, cpVect point);
 
+/// Apply a torque
+CP_EXPORT void cpBodyApplyTorque(cpBody *body, cpFloat torque);
+
+/// Apply angular impulse
+CP_EXPORT void cpBodyApplyAngularImpulse(cpBody *body, cpFloat impulse);
+
 /// Apply an impulse to a body. Both the impulse and point are expressed in world coordinates.
 CP_EXPORT void cpBodyApplyImpulseAtWorldPoint(cpBody *body, cpVect impulse, cpVect point);
 /// Apply an impulse to a body. Both the impulse and point are expressed in body local coordinates.

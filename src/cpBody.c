@@ -579,6 +579,28 @@ cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point)
 	cpBodyApplyImpulseAtWorldPoint(body, cpTransformVect(body->transform, impulse), cpTransformPoint(body->transform, point));
 }
 
+void 
+cpBodyApplyTorque(cpBody *body, cpFloat torque)
+{
+	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
+		return;
+
+	cpBodyActivate(body);
+
+	body->t += torque;
+}
+
+void 
+cpBodyApplyAngularImpulse(cpBody *body, cpFloat impulse)
+{
+	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
+		return;
+	
+	cpBodyActivate(body);
+	
+	body->w += body->i_inv * impulse;
+}
+
 cpVect
 cpBodyGetVelocityAtLocalPoint(const cpBody *body, cpVect point)
 {
