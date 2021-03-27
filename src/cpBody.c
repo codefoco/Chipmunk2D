@@ -433,12 +433,31 @@ cpBodyGetAngle(const cpBody *body)
 }
 
 void
+cpBodyGetTransform(const cpBody *body, cpVect * position, cpFloat * angle)
+{
+	*angle = body->a;
+	*position = body->p;
+}
+
+void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
 	cpBodyActivate(body);
 	SetAngle(body, angle);
 	
 	SetTransform(body, body->p, angle);
+}
+
+void
+cpBodySetTransform(cpBody *body, cpVect position, cpFloat angle)
+{
+	cpBodyActivate(body);
+	cpVect p = cpvadd(cpTransformVect(body->transform, body->cog), position);
+	body->p = p;
+	body->a = angle;
+	cpAssertSaneBody(body);
+	
+	SetTransform(body, p, angle);
 }
 
 cpFloat

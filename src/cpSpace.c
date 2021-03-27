@@ -645,6 +645,15 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 	} cpSpaceUnlock(space, cpTrue);
 }
 
+void
+cpSpaceEachDynamicBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
+{
+	cpArray *bodies = space->dynamicBodies;
+	for(int i=0; i<bodies->num; i++){
+		func((cpBody *)bodies->arr[i], data);
+	}
+}
+
 typedef struct spaceShapeContext {
 	cpSpaceShapeIteratorFunc func;
 	void *data;

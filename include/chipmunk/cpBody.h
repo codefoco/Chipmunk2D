@@ -119,6 +119,11 @@ CP_EXPORT cpFloat cpBodyGetAngle(const cpBody *body);
 /// Set the angle of a body.
 CP_EXPORT void cpBodySetAngle(cpBody *body, cpFloat a);
 
+/// Get the position and the rotation angle of the body
+CP_EXPORT void cpBodyGetTransform(const cpBody *body, cpVect * position, cpFloat * angle);
+/// Set the position and the rotation angle of the body
+CP_EXPORT void cpBodySetTransform(cpBody *body, cpVect position, cpFloat angle);
+
 /// Get the angular velocity of the body.
 CP_EXPORT cpFloat cpBodyGetAngularVelocity(const cpBody *body);
 /// Set the angular velocity of the body.

@@ -224,6 +224,8 @@ CP_EXPORT cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQ
 typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
 /// Call @c func for each body in the space.
 CP_EXPORT void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
+/// Call @c func for each dynamic body in the space.
+CP_EXPORT void cpSpaceEachDynamicBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
 
 /// Space/body iterator callback function type.
 typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data);
