@@ -73,6 +73,8 @@ struct cpBody {
 	cpArbiter *arbiterList;
 	cpConstraint *constraintList;
 	
+	cpArray* contactedBodies;
+
 	struct {
 		cpBody *root;
 		cpBody *next;

@@ -531,6 +531,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		}
 		
 		cpArbiterUnthread(arb);
+		cpBodyRemoveContactedBodies(arb);
 		cpArrayDeleteObj(context->space->arbiters, arb);
 		cpArrayPush(context->space->pooledArbiters, arb);
 		

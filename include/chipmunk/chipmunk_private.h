@@ -78,6 +78,17 @@ void cpBodyAccumulateMassFromShapes(cpBody *body);
 
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
+static inline void
+cpBodyRemoveContactedBodies(cpArbiter* arbiter)
+{
+	cpBody* bodyA = arbiter->body_a;
+	cpBody* bodyB = arbiter->body_b;
+
+	cpArrayDeleteObj(bodyA->contactedBodies, bodyB);
+	cpArrayDeleteObj(bodyB->contactedBodies, bodyA);
+}
+
+void cpBodyAddContactedBodies(cpArbiter * arbiter);
 
 //MARK: Spatial Index Functions
 

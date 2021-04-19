@@ -37,6 +37,8 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->shapeList = NULL;
 	body->arbiterList = NULL;
 	body->constraintList = NULL;
+
+	body->contactedBodies = cpArrayNew(0);
 	
 	body->velocity_func = cpBodyUpdateVelocity;
 	body->position_func = cpBodyUpdatePosition;
@@ -91,7 +93,7 @@ cpBodyNewStatic()
 
 void cpBodyDestroy(cpBody *body)
 {
-	(void)(body);
+	cpArrayFree(body->contactedBodies);
 }
 
 void
@@ -324,6 +326,29 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 	if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC && shape->massInfo.m > 0.0f){
 		cpBodyAccumulateMassFromShapes(body);
 	}
+}
+
+void
+cpBodyAddContactedBodies(cpArbiter * arbiter)
+{
+	cpBody * bodyA = arbiter->body_a;
+	cpBody * bodyB = arbiter->body_b;
+
+	cpArray* bodiesA = bodyA->contactedBodies;
+	cpArray* bodiesB = bodyB->contactedBodies;
+
+	// The body might be already in contact, so we check 
+	// using the smaller contactedBodies array
+	if (bodiesB->num < bodiesA->num){
+		if (cpArrayContains(bodiesB, bodyA))
+			return;
+	} else {
+		if (cpArrayContains(bodiesA, bodyB))
+			return;
+	}
+
+	cpArrayPush(bodiesA, bodyB);
+	cpArrayPush(bodiesB, bodyA);
 }
 
 static cpConstraint *
@@ -679,4 +704,24 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 		
 		arb = next;
 	}
+}
+
+void
+cpBodyGetContactedBodies(cpBody *body, cpBody ***bodies, int * count)
+{
+	*bodies = ((cpBody **)body->contactedBodies->arr);
+	*count = body->contactedBodies->num;
+}
+
+cpBool
+cpBodyContactWith(cpBody *bodyA, cpBody *bodyB)
+{
+	cpArray* bodiesA = bodyA->contactedBodies;
+	cpArray* bodiesB = bodyB->contactedBodies;
+
+	if (bodiesB->num < bodiesA->num){
+		return cpArrayContains(bodiesB, bodyA);
+	}
+
+	return cpArrayContains(bodiesA, bodyB);
 }
