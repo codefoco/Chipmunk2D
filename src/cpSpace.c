@@ -526,12 +526,12 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 			// Invalidate the arbiter since one of the shapes was removed.
 			arb->state = CP_ARBITER_STATE_INVALIDATED;
 			
+			cpBodyRemoveContactedBodies(arb);
 			cpCollisionHandler *handler = arb->handler;
 			handler->separateFunc(arb, context->space, handler->userData);
 		}
 		
 		cpArbiterUnthread(arb);
-		cpBodyRemoveContactedBodies(arb);
 		cpArrayDeleteObj(context->space->arbiters, arb);
 		cpArrayPush(context->space->pooledArbiters, arb);
 		
@@ -646,12 +646,71 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 	} cpSpaceUnlock(space, cpTrue);
 }
 
+int 
+cpSpaceGetBodyCount(cpSpace *space)
+{
+	int bodyCount = 0;
+
+	cpArray *components = space->sleepingComponents;
+	for(int i=0; i<components->num; i++){
+		cpBody *root = (cpBody *)components->arr[i];
+		
+		cpBody *body = root;
+		while(body){
+			cpBody *next = body->sleeping.next;
+			bodyCount++;
+			body = next;
+		}
+	}
+
+	bodyCount += space->dynamicBodies->num;
+	bodyCount += space->staticBodies->num;
+
+	return bodyCount;
+}
+
 void
-cpSpaceEachDynamicBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
+cpSpaceGetBodiesUserDataArray(cpSpace *space, void **userDataArray)
 {
 	cpArray *bodies = space->dynamicBodies;
 	for(int i=0; i<bodies->num; i++){
-		func((cpBody *)bodies->arr[i], data);
+		*userDataArray = ((cpBody *)bodies->arr[i])->userData;
+		userDataArray++;
+	}
+	
+	cpArray *otherBodies = space->staticBodies;
+	for(int i=0; i<otherBodies->num; i++){
+		*userDataArray = ((cpBody *)otherBodies->arr[i])->userData;
+		userDataArray++;
+	}
+	
+	cpArray *components = space->sleepingComponents;
+	for(int i=0; i<components->num; i++){
+		cpBody *root = (cpBody *)components->arr[i];
+		
+		cpBody *body = root;
+		while(body){
+			cpBody *next = body->sleeping.next;
+			*userDataArray = body->userData;
+			userDataArray++;
+			body = next;
+		}
+	}
+}
+
+int
+cpSpaceGetDynamicBodyCount(cpSpace *space)
+{
+	return space->dynamicBodies->num;
+}
+
+void
+cpSpaceGetDynamicBodiesUserDataArray(cpSpace *space, void **userDataArray)
+{
+	cpArray *bodies = space->dynamicBodies;
+	for(int i=0; i<bodies->num; i++){
+		*userDataArray = ((cpBody *)bodies->arr[i])->userData;
+		userDataArray++;
 	}
 }
 

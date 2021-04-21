@@ -706,11 +706,20 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 	}
 }
 
-void
-cpBodyGetContactedBodies(cpBody *body, cpBody ***bodies, int * count)
+int
+cpBodyGetContactedBodiesCount(cpBody *body)
 {
-	*bodies = ((cpBody **)body->contactedBodies->arr);
-	*count = body->contactedBodies->num;
+	return body->contactedBodies->num;
+}
+
+void
+cpBodyGetUserDataContactedBodies(cpBody *body, void **userDataArray)
+{
+	cpArray *bodies = body->contactedBodies;
+	for(int i=0; i<bodies->num; i++){
+		*userDataArray = ((cpBody *)bodies->arr[i])->userData;
+		userDataArray++;
+	}
 }
 
 cpBool

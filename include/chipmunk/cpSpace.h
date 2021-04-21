@@ -224,8 +224,6 @@ CP_EXPORT cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQ
 typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
 /// Call @c func for each body in the space.
 CP_EXPORT void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
-/// Call @c func for each dynamic body in the space.
-CP_EXPORT void cpSpaceEachDynamicBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
 
 /// Space/body iterator callback function type.
 typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data);
@@ -237,6 +235,17 @@ typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *da
 /// Call @c func for each shape in the space.
 CP_EXPORT void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data);
 
+/// Call @c func get the total of bodies in space
+CP_EXPORT int cpSpaceGetBodyCount(cpSpace *space);
+
+/// Call @c func get the total of bodies in space
+CP_EXPORT void cpSpaceGetBodiesUserDataArray(cpSpace *space, void **userDataArray);
+
+/// Call @c func get the total of dynamic bodies in space
+CP_EXPORT int cpSpaceGetDynamicBodyCount(cpSpace *space);
+
+/// Call @c func get the total of bodies in space
+CP_EXPORT void cpSpaceGetDynamicBodiesUserDataArray(cpSpace *space, void **userDataArray);
 
 //MARK: Indexing
 
