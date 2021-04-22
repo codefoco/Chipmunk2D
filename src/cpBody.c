@@ -707,13 +707,13 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 }
 
 int
-cpBodyGetContactedBodiesCount(cpBody *body)
+cpBodyGetContactedBodiesCount(const cpBody *body)
 {
 	return body->contactedBodies->num;
 }
 
 void
-cpBodyGetUserDataContactedBodies(cpBody *body, void **userDataArray)
+cpBodyGetUserDataContactedBodies(const cpBody *body, void **userDataArray)
 {
 	cpArray *bodies = body->contactedBodies;
 	for(int i=0; i<bodies->num; i++){
@@ -723,14 +723,14 @@ cpBodyGetUserDataContactedBodies(cpBody *body, void **userDataArray)
 }
 
 cpBool
-cpBodyContactWith(cpBody *bodyA, cpBody *bodyB)
+cpBodyContactWith(const cpBody *bodyA, const cpBody *bodyB)
 {
-	cpArray* bodiesA = bodyA->contactedBodies;
-	cpArray* bodiesB = bodyB->contactedBodies;
+	const cpArray* bodiesA = bodyA->contactedBodies;
+	const cpArray* bodiesB = bodyB->contactedBodies;
 
 	if (bodiesB->num < bodiesA->num){
-		return cpArrayContains(bodiesB, bodyA);
+		return cpArrayContains(bodiesB, (void *)bodyA);
 	}
 
-	return cpArrayContains(bodiesA, bodyB);
+	return cpArrayContains(bodiesA, (void *)bodyB);
 }

@@ -41,7 +41,7 @@ void cpArrayFree(cpArray *arr);
 void cpArrayPush(cpArray *arr, void *object);
 void *cpArrayPop(cpArray *arr);
 void cpArrayDeleteObj(cpArray *arr, void *obj);
-cpBool cpArrayContains(cpArray *arr, void *ptr);
+cpBool cpArrayContains(const cpArray *arr, void *ptr);
 
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 

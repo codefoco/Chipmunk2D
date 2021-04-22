@@ -203,12 +203,12 @@ typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void
 CP_EXPORT void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data);
 
 /// Get count of bodies in contact with body
-CP_EXPORT int cpBodyGetContactedBodiesCount(cpBody *body);
+CP_EXPORT int cpBodyGetContactedBodiesCount(const cpBody *body);
 
 /// Get list of user data value from contacted bodies
-CP_EXPORT void cpBodyGetUserDataContactedBodies(cpBody *body, void **userDataArray);
+CP_EXPORT void cpBodyGetUserDataContactedBodies(const cpBody *body, void **userDataArray);
 
 /// Check if two bodies are in contact
-CP_EXPORT cpBool cpBodyContactWith(cpBody *bodyA, cpBody *bodyB);
+CP_EXPORT cpBool cpBodyContactWith(const cpBody *bodyA, const cpBody *bodyB);
 
 ///@}
