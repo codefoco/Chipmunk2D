@@ -260,7 +260,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	// Call the begin function first if it's the first step
 	if (arb->state == CP_ARBITER_STATE_FIRST_COLLISION){
 		// Add the bodies to the contected list
-		cpBodyAddContactedBodies(arb);
+		cpBodyAddContactedBodies(a->body, b->body);
 
 		if(!handler->beginFunc(arb, space, handler->userData)){
 			cpArbiterIgnore(arb); // permanently ignore the collision until separation
@@ -318,7 +318,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != CP_ARBITER_STATE_CACHED){
 		arb->state = CP_ARBITER_STATE_CACHED;
-		cpBodyRemoveContactedBodies(arb);
+		cpBodyRemoveContactedBodies(a, b);
 		cpCollisionHandler *handler = arb->handler;
 		handler->separateFunc(arb, space, handler->userData);
 	}

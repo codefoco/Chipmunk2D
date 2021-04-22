@@ -329,11 +329,8 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 }
 
 void
-cpBodyAddContactedBodies(cpArbiter * arbiter)
+cpBodyAddContactedBodies(cpBody* bodyA, cpBody* bodyB)
 {
-	cpBody * bodyA = arbiter->body_a;
-	cpBody * bodyB = arbiter->body_b;
-
 	cpArray* bodiesA = bodyA->contactedBodies;
 	cpArray* bodiesB = bodyB->contactedBodies;
 

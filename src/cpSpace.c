@@ -515,7 +515,6 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 	cpShape *shape = context->shape;
 	cpBody *body = context->body;
 	
-	
 	// Match on the filter shape, or if it's NULL the filter body
 	if(
 		(body == arb->body_a && (shape == arb->a || shape == NULL)) ||
@@ -526,7 +525,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 			// Invalidate the arbiter since one of the shapes was removed.
 			arb->state = CP_ARBITER_STATE_INVALIDATED;
 			
-			cpBodyRemoveContactedBodies(arb);
+			cpBodyRemoveContactedBodies(arb->body_a, arb->body_b);
 			cpCollisionHandler *handler = arb->handler;
 			handler->separateFunc(arb, context->space, handler->userData);
 		}
