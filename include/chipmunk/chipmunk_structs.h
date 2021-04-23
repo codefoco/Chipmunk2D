@@ -73,13 +73,14 @@ struct cpBody {
 	cpArbiter *arbiterList;
 	cpConstraint *constraintList;
 	
-	cpArray* contactedBodies;
 
 	struct {
 		cpBody *root;
 		cpBody *next;
 		cpFloat idleTime;
 	} sleeping;
+	
+	cpArray* contactedBodies;
 };
 
 enum cpArbiterState {
