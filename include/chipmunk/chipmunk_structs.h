@@ -75,6 +75,10 @@ struct cpBody {
 	cpConstraint *constraintList;
 	cpArray* contactedBodies;
 
+	cpBitmask category;
+	cpBitmask contactMask;
+	cpBitmask collisionMask;
+
 	cpBody *sleeping_root;
 	cpBody *sleeping_next;
 	cpFloat sleeping_idleTime;
@@ -191,7 +195,6 @@ struct cpShape {
 	cpDataPointer userData;
 	
 	cpCollisionType type;
-	cpShapeFilter filter;
 	
 	cpShape *next;
 	cpShape *prev;

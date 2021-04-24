@@ -150,16 +150,27 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 }
 
 static inline cpBool
-cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
+cpBodyFilterReject(const cpBody* a, const cpBody* b)
 {
+	int categoryA = a->category    | a->collisionMask;
+	int maskA     = a->contactMask | a->collisionMask;
+	int categoryB = b->category    | b->collisionMask;
+	int maskB     = b->contactMask | b->collisionMask;
 	// Reject the collision if:
 	return (
-		// They are in the same non-zero group.
-		(a.group != 0 && a.group == b.group) ||
 		// One of the category/mask combinations fails.
-		(a.categories & b.mask) == 0 ||
-		(b.categories & a.mask) == 0
+		(categoryA & maskB) == 0 ||
+		(categoryB & maskA) == 0
 	);
+}
+
+static inline cpBool
+cpBodyFilterReject2(const cpBody* a, cpBitmask mask)
+{
+	int categoryA = a->category    | a->collisionMask;
+
+	// Reject the collision if:
+	return (categoryA & mask) == 0;
 }
 
 void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);

@@ -205,13 +205,13 @@ void cpBodyEachConstraint_b(cpBody *body, void (^block)(cpConstraint *constraint
 void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter));
 
 typedef void (^cpSpacePointQueryBlock)(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient);
-void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryBlock block);
+void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpBitmask filter, cpSpacePointQueryBlock block);
 
 typedef void (^cpSpaceSegmentQueryBlock)(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha);
-void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryBlock block);
+void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpBitmask filter, cpSpaceSegmentQueryBlock block);
 
 typedef void (^cpSpaceBBQueryBlock)(cpShape *shape);
-void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryBlock block);
+void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpBitmask filter, cpSpaceBBQueryBlock block);
 
 typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
 cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);

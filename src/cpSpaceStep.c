@@ -229,7 +229,7 @@ QueryReject(cpShape *a, cpShape *b)
 		// Don't collide shapes attached to the same body.
 		|| a->body == b->body
 		// Don't collide shapes that are filtered.
-		|| cpShapeFilterReject(a->filter, b->filter)
+		|| cpBodyFilterReject(a->body, b->body)
 		// Don't collide bodies if they have a constraint with collideBodies == cpFalse.
 		|| QueryRejectConstraint(a->body, b->body)
 	);

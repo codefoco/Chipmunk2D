@@ -43,9 +43,6 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpSh
 	shape->surfaceV = cpvzero;
 	
 	shape->type = 0;
-	shape->filter.group = CP_NO_GROUP;
-	shape->filter.categories = CP_ALL_CATEGORIES;
-	shape->filter.mask = CP_ALL_CATEGORIES;
 	
 	shape->userData = NULL;
 	
@@ -192,19 +189,6 @@ cpShapeSetCollisionType(cpShape *shape, cpCollisionType collisionType)
 {
 	cpBodyActivate(shape->body);
 	shape->type = collisionType;
-}
-
-cpShapeFilter
-cpShapeGetFilter(const cpShape *shape)
-{
-	return shape->filter;
-}
-
-void
-cpShapeSetFilter(cpShape *shape, cpShapeFilter filter)
-{
-	cpBodyActivate(shape->body);
-	shape->filter = filter;
 }
 
 cpBB

@@ -58,3 +58,4 @@ osx-arm64/*
 win-arm/*
 win-arm64/*
 linux-x64/*
+osx
