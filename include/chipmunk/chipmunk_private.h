@@ -347,6 +347,6 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 	for(cpShape *var = body->shapeList; var; var = var->next)
 
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
-	for(cpBody *var = root; var; var = var->sleeping.next)
+	for(cpBody *var = root; var; var = var->sleeping_next)
 
 #endif

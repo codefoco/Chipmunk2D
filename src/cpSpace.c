@@ -637,7 +637,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			
 			cpBody *body = root;
 			while(body){
-				cpBody *next = body->sleeping.next;
+				cpBody *next = body->sleeping_next;
 				func(body, data);
 				body = next;
 			}
@@ -656,7 +656,7 @@ cpSpaceGetBodyCount(cpSpace *space)
 		
 		cpBody *body = root;
 		while(body){
-			cpBody *next = body->sleeping.next;
+			cpBody *next = body->sleeping_next;
 			bodyCount++;
 			body = next;
 		}
@@ -689,7 +689,7 @@ cpSpaceGetBodiesUserDataArray(cpSpace *space, void **userDataArray)
 		
 		cpBody *body = root;
 		while(body){
-			cpBody *next = body->sleeping.next;
+			cpBody *next = body->sleeping_next;
 			*userDataArray = body->userData;
 			userDataArray++;
 			body = next;

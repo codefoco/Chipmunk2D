@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "chipmunk_private.h": "c",
+        "chipmunk_structs.h": "c"
+    }
+}

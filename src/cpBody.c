@@ -27,7 +27,7 @@
 cpBody*
 cpBodyAlloc(void)
 {
-	return (cpBody *)cpcalloc(1, sizeof(cpBody) + sizeof(cpArray*));
+	return (cpBody *)cpcalloc(1, sizeof(cpBody));
 }
 
 cpBody *
@@ -43,9 +43,9 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->velocity_func = cpBodyUpdateVelocity;
 	body->position_func = cpBodyUpdatePosition;
 	
-	body->sleeping.root = NULL;
-	body->sleeping.next = NULL;
-	body->sleeping.idleTime = 0.0f;
+	body->sleeping_root = NULL;
+	body->sleeping_next = NULL;
+	body->sleeping_idleTime = 0.0f;
 	
 	body->p = cpvzero;
 	body->v = cpvzero;
@@ -58,6 +58,7 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->w_bias = 0.0f;
 	
 	body->userData = NULL;
+	body->type = CP_BODY_TYPE_DYNAMIC;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, mass);
@@ -135,30 +136,26 @@ cpBodyFree(cpBody *body)
 cpBool
 cpBodyIsSleeping(const cpBody *body)
 {
-	return (body->sleeping.root != ((cpBody*)0));
+	return (body->sleeping_root != ((cpBody*)0));
 }
 
 cpBodyType
-cpBodyGetType(cpBody *body)
+cpBodyGetType(const cpBody *body)
 {
-	if(body->sleeping.idleTime == INFINITY){
-		return CP_BODY_TYPE_STATIC;
-	} else if(body->m == INFINITY){
-		return CP_BODY_TYPE_KINEMATIC;
-	} else {
-		return CP_BODY_TYPE_DYNAMIC;
-	}
+	return body->type;
 }
 
 void
 cpBodySetType(cpBody *body, cpBodyType type)
 {
 	cpBodyType oldType = cpBodyGetType(body);
-	if(oldType == type) return;
-	
+	if(oldType == type)
+		return;
+
+	body->type = type;
 	// Static bodies have their idle timers set to infinity.
 	// Non-static bodies should have their idle timer reset.
-	body->sleeping.idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
+	body->sleeping_idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
 	
 	if(type == CP_BODY_TYPE_DYNAMIC){
 		body->m = body->i = 0.0f;

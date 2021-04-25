@@ -33,6 +33,7 @@ struct cpArray {
 };
 
 struct cpBody {
+	cpBodyType type;
 	// Integration functions
 	cpBodyVelocityFunc velocity_func;
 	cpBodyPositionFunc position_func;
@@ -72,15 +73,11 @@ struct cpBody {
 	cpShape *shapeList;
 	cpArbiter *arbiterList;
 	cpConstraint *constraintList;
-	
-
-	struct {
-		cpBody *root;
-		cpBody *next;
-		cpFloat idleTime;
-	} sleeping;
-	
 	cpArray* contactedBodies;
+
+	cpBody *sleeping_root;
+	cpBody *sleeping_next;
+	cpFloat sleeping_idleTime;
 };
 
 enum cpArbiterState {

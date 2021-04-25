@@ -34,7 +34,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		// cpSpaceActivateBody() is called again once the space is unlocked
 		if(!cpArrayContains(space->rousedBodies, body)) cpArrayPush(space->rousedBodies, body);
 	} else {
-		cpAssertSoft(body->sleeping.root == NULL && body->sleeping.next == NULL, "Internal error: Activating body non-NULL node pointers.");
+		cpAssertSoft(body->sleeping_root == NULL && body->sleeping_next == NULL, "Internal error: Activating body non-NULL node pointers.");
 		cpArrayPush(space->dynamicBodies, body);
 
 		CP_BODY_FOREACH_SHAPE(body, shape){
@@ -113,14 +113,14 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 static inline cpBody *
 ComponentRoot(cpBody *body)
 {
-	return (body ? body->sleeping.root : NULL);
+	return (body ? body->sleeping_root : NULL);
 }
 
 void
 cpBodyActivate(cpBody *body)
 {
 	if(body != NULL && cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC){
-		body->sleeping.idleTime = 0.0f;
+		body->sleeping_idleTime = 0.0f;
 		
 		cpBody *root = ComponentRoot(body);
 		if(root && cpBodyIsSleeping(root)){
@@ -130,11 +130,11 @@ cpBodyActivate(cpBody *body)
 			cpSpace *space = root->space;
 			cpBody *b = root;
 			while(b){
-				cpBody *next = b->sleeping.next;
+				cpBody *next = b->sleeping_next;
 				
-				b->sleeping.idleTime = 0.0f;
-				b->sleeping.root = NULL;
-				b->sleeping.next = NULL;
+				b->sleeping_idleTime = 0.0f;
+				b->sleeping_root = NULL;
+				b->sleeping_next = NULL;
 				cpSpaceActivateBody(space, b);
 				
 				b = next;
@@ -146,8 +146,8 @@ cpBodyActivate(cpBody *body)
 		CP_BODY_FOREACH_ARBITER(body, arb){
 			// Reset the idle timer of things the body is touching as well.
 			// That way things don't get left hanging in the air.
-			cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
-			if(cpBodyGetType(other) != CP_BODY_TYPE_STATIC) other->sleeping.idleTime = 0.0f;
+			cpBody *other = (arb->a->body == body ? arb->a->body : arb->b->body);
+			if(cpBodyGetType(other) != CP_BODY_TYPE_STATIC) other->sleeping_idleTime = 0.0f;
 		}
 	}
 }
@@ -182,11 +182,11 @@ cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 
 static inline void
 ComponentAdd(cpBody *root, cpBody *body){
-	body->sleeping.root = root;
+	body->sleeping_root = root;
 
 	if(body != root){
-		body->sleeping.next = root->sleeping.next;
-		root->sleeping.next = body;
+		body->sleeping_next = root->sleeping_next;
+		root->sleeping_next = body;
 	}
 }
 
@@ -211,7 +211,7 @@ static inline cpBool
 ComponentActive(cpBody *root, cpFloat threshold)
 {
 	CP_BODY_FOREACH_COMPONENT(root, body){
-		if(body->sleeping.idleTime < threshold) return cpTrue;
+		if(body->sleeping_idleTime < threshold) return cpTrue;
 	}
 	
 	return cpFalse;
@@ -227,8 +227,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
-		cpAssertSoft(body->sleeping.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
-		cpAssertSoft(body->sleeping.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
+		cpAssertSoft(body->sleeping_next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
+		cpAssertSoft(body->sleeping_root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
 	}
 #endif
 	
@@ -246,7 +246,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 			
 			// Need to deal with infinite mass objects
 			cpFloat keThreshold = (dvsq ? body->m*dvsq : 0.0f);
-			body->sleeping.idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->sleeping.idleTime + dt);
+			body->sleeping_idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->sleeping_idleTime + dt);
 		}
 	}
 	
@@ -300,8 +300,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 			i++;
 			
 			// Only sleeping bodies retain their component node pointers.
-			body->sleeping.root = NULL;
-			body->sleeping.next = NULL;
+			body->sleeping_root = NULL;
+			body->sleeping_next = NULL;
 		}
 	}
 }
@@ -332,15 +332,15 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	if(group){
 		cpBody *root = ComponentRoot(group);
 		
-		body->sleeping.root = root;
-		body->sleeping.next = root->sleeping.next;
-		body->sleeping.idleTime = 0.0f;
+		body->sleeping_root = root;
+		body->sleeping_next = root->sleeping_next;
+		body->sleeping_idleTime = 0.0f;
 		
-		root->sleeping.next = body;
+		root->sleeping_next = body;
 	} else {
-		body->sleeping.root = body;
-		body->sleeping.next = NULL;
-		body->sleeping.idleTime = 0.0f;
+		body->sleeping_root = body;
+		body->sleeping_next = NULL;
+		body->sleeping_idleTime = 0.0f;
 		
 		cpArrayPush(space->sleepingComponents, body);
 	}
