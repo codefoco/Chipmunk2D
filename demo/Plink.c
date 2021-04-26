@@ -43,11 +43,11 @@ update(cpSpace *space, double dt)
 		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRAB_FILTER, NULL);
 		if(nearest){
 			cpBody *body = cpShapeGetBody(nearest);
-			if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
+			if(_cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
 				cpBodySetType(body, CP_BODY_TYPE_DYNAMIC);
 				cpBodySetMass(body, pentagon_mass);
 				cpBodySetMoment(body, pentagon_moment);
-			} else if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC) {
+			} else if(_cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC) {
 				cpBodySetType(body, CP_BODY_TYPE_STATIC);
 			}
 		}

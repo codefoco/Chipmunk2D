@@ -309,8 +309,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
 	// This prevents errant separate callbacks from happenening.
 	if(
-		(cpBodyGetType(a) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(a)) &&
-		(cpBodyGetType(b) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(b))
+		(_cpBodyGetType(a) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(a)) &&
+		(_cpBodyGetType(b) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(b))
 	){
 		return cpTrue;
 	}
@@ -447,10 +447,21 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 		
 		// run the post-solve callbacks
+		//
+		//  WARNING: The code below was changed to avoid calling postSolveFunc
+		//  unecessary with ChipmunkBinding, since that cost going back and forth on managed/unmanage code
+		//  if you are using this fork of Chipmunk you might see a few differences in behavior on 
+		//  collision handlers callbacks
+		//
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
-			
 			cpCollisionHandler *handler = arb->handler;
+			
+			if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
+				handler->postSolveFunc == cpCollisionHandlerDoNothing.postSolveFunc ||
+				!cpBodyCanContact(arb->a->body, arb->b->body))
+				continue;
+			
 			handler->postSolveFunc(arb, space, handler->userData);
 		}
 	} cpSpaceUnlock(space, cpTrue);

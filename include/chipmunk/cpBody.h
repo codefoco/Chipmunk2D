@@ -81,6 +81,21 @@ CP_EXPORT cpBodyType cpBodyGetType(const cpBody *body);
 /// Set the type of the body.
 CP_EXPORT void cpBodySetType(cpBody *body, cpBodyType type);
 
+/// Get the body contact category.
+CP_EXPORT cpBitmask cpBodyGetCategory(const cpBody *body);
+/// Set the body contact category.
+CP_EXPORT void cpBodySetCategory(cpBody *body, cpBitmask category);
+
+/// Get the contact mask of the body.
+CP_EXPORT cpBitmask cpBodyGetContactMask(const cpBody *body);
+/// Set the contact mask of the body.
+CP_EXPORT void cpBodySetContactMask(cpBody *body, cpBitmask contactMask);
+
+/// Get the collision mask of the body.
+CP_EXPORT cpBitmask cpBodyGetCollisionMask(const cpBody *body);
+/// Set the collision mask of the body.
+CP_EXPORT void cpBodySetCollisionMask(cpBody *body, cpBitmask collisionMask);
+
 /// Get the space this body is added to.
 CP_EXPORT cpSpace* cpBodyGetSpace(const cpBody *body);
 
