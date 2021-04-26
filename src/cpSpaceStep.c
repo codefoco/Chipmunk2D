@@ -261,10 +261,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	if (arb->state == CP_ARBITER_STATE_FIRST_COLLISION){
 		// Add the bodies to the contected list
 		cpBodyAddContactedBodies(a->body, b->body);
-
-		if(!handler->beginFunc(arb, space, handler->userData)){
-			cpArbiterIgnore(arb); // permanently ignore the collision until separation
-		}
+		cpSpaceCallBeginFunc(space, arb);
 	}
 	
 	if(
@@ -319,8 +316,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	if(ticks >= 1 && arb->state != CP_ARBITER_STATE_CACHED){
 		arb->state = CP_ARBITER_STATE_CACHED;
 		cpBodyRemoveContactedBodies(a, b);
-		cpCollisionHandler *handler = arb->handler;
-		handler->separateFunc(arb, space, handler->userData);
+		cpSpaceCallSeparateFunc(space, arb);
 	}
 	
 	if(ticks >= space->collisionPersistence){
@@ -455,14 +451,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		//
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
-			cpCollisionHandler *handler = arb->handler;
-			
-			if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
-				handler->postSolveFunc == cpCollisionHandlerDoNothing.postSolveFunc ||
-				!cpBodyCanContact(arb->a->body, arb->b->body))
-				continue;
-			
-			handler->postSolveFunc(arb, space, handler->userData);
+			cpSpaceCallPostSolveFunc(space, arb);
 		}
 	} cpSpaceUnlock(space, cpTrue);
 }

@@ -346,6 +346,54 @@ cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type)
 	return (type == CP_BODY_TYPE_STATIC ? space->staticBodies : space->dynamicBodies);
 }
 
+static inline void
+cpSpaceCallPostSolveFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+
+	if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
+		handler->postSolveFunc == cpCollisionHandlerDoNothing.postSolveFunc ||
+		!cpBodyCanContact(arb->a->body, arb->b->body))
+		return;
+	
+	handler->postSolveFunc(arb, space, handler->userData);
+}
+
+static inline void
+cpSpaceCallSeparateFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+
+	if (handler->separateFunc == cpCollisionHandlerDoNothing.separateFunc ||
+		!cpBodyCanContact(arb->a->body, arb->b->body))
+		return;
+	
+	handler->separateFunc(arb, space, handler->userData);
+}
+
+static inline void cpSpaceCallBeginFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+	const cpBody * bodyA = arb->a->body;
+	const cpBody * bodyB = arb->b->body;
+
+	if (handler->beginFunc == cpCollisionHandlerDoNothing.beginFunc) {
+		if (!cpBodyCanCollide(bodyA, bodyB)) {
+			cpArbiterIgnore(arb); // permanently ignore the collision until separation
+		}
+		return;
+	}
+
+	if (cpBodyCanCollide(bodyA, bodyB)) {
+		return;
+	}
+
+	if(!handler->beginFunc(arb, space, handler->userData)){
+		cpArbiterIgnore(arb); // permanently ignore the collision until separation
+	}
+}
+
+
 void cpShapeUpdateFunc(cpShape *shape, void *unused);
 cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space);
 

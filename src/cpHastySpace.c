@@ -701,14 +701,7 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 		//
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
-			cpCollisionHandler *handler = arb->handler;
-			
-			if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
-				handler->postSolveFunc == cpCollisionHandlerDoNothing.postSolveFunc ||
-				!cpBodyCanContact(arb->a->body, arb->b->body))
-				continue;
-			
-			handler->postSolveFunc(arb, space, handler->userData);
+			cpSpaceCallPostSolveFunc(space, arb);
 		}
 	} cpSpaceUnlock(space, cpTrue);
 }

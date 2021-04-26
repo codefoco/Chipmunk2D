@@ -526,8 +526,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 			arb->state = CP_ARBITER_STATE_INVALIDATED;
 			
 			cpBodyRemoveContactedBodies(arb->body_a, arb->body_b);
-			cpCollisionHandler *handler = arb->handler;
-			handler->separateFunc(arb, context->space, handler->userData);
+			cpSpaceCallSeparateFunc(context->space, arb);
 		}
 		
 		cpArbiterUnthread(arb);
