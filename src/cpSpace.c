@@ -455,7 +455,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	
 	cpBody *body = shape->body;
 	
-	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
+	cpBool isStatic = (_cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(!isStatic) cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
 	
@@ -474,7 +474,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	cpAssertHard(!body->space, "You have already added this body to another space. You cannot add it to a second.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpArrayPush(cpSpaceArrayForBodyType(space, cpBodyGetType(body)), body);
+	cpArrayPush(cpSpaceArrayForBodyType(space, _cpBodyGetType(body)), body);
 	body->space = space;
 	
 	return body;
@@ -526,8 +526,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 			arb->state = CP_ARBITER_STATE_INVALIDATED;
 			
 			cpBodyRemoveContactedBodies(arb->body_a, arb->body_b);
-			cpCollisionHandler *handler = arb->handler;
-			handler->separateFunc(arb, context->space, handler->userData);
+			cpSpaceCallSeparateFunc(context->space, arb);
 		}
 		
 		cpArbiterUnthread(arb);
@@ -556,7 +555,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
+	cpBool isStatic = (_cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(isStatic){
 		cpBodyActivateStatic(body, shape);
 	} else {
@@ -581,7 +580,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	
 	cpBodyActivate(body);
 //	cpSpaceFilterArbiters(space, body, NULL);
-	cpArrayDeleteObj(cpSpaceArrayForBodyType(space, cpBodyGetType(body)), body);
+	cpArrayDeleteObj(cpSpaceArrayForBodyType(space, _cpBodyGetType(body)), body);
 	body->space = NULL;
 }
 

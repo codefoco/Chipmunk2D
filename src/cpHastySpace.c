@@ -693,11 +693,15 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 		}
 		
 		// run the post-solve callbacks
+		//
+		//  WARNING: The code below was changed to avoid calling postSolveFunc
+		//  unecessary with ChipmunkBinding, since that cost going back and forth on managed/unmanage code
+		//  if you are using this fork of Chipmunk you might see a few differences in behavior on 
+		//  collision handlers callbacks
+		//
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
-			
-			cpCollisionHandler *handler = arb->handler;
-			handler->postSolveFunc(arb, space, handler->userData);
+			cpSpaceCallPostSolveFunc(space, arb);
 		}
 	} cpSpaceUnlock(space, cpTrue);
 }

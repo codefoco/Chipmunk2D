@@ -149,17 +149,44 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	}
 }
 
-static inline cpBool
-cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
+static inline cpBodyType _cpBodyGetType(const cpBody* body)
 {
+	return body->type;
+}
+
+static inline cpBool cpBodyCanContact(const cpBody* bodyA, const cpBody* bodyB)
+{
+		return  (bodyA->contactMask & bodyB->category) != 0 ||
+				(bodyA->category    & bodyB->contactMask) != 0;
+}
+
+static inline cpBool cpBodyCanCollide(const cpBody* bodyA, const cpBody* bodyB)
+{
+		return  (bodyA->collisionMask & bodyB->category) != 0 ||
+				(bodyA->category      & bodyB->collisionMask) != 0;
+}
+
+static inline cpBool
+cpBodyFilterReject(const cpBody* a, const cpBody* b)
+{
+	int categoryA = a->category    | a->collisionMask;
+	int maskA     = a->contactMask | a->collisionMask;
+	int categoryB = b->category    | b->collisionMask;
+	int maskB     = b->contactMask | b->collisionMask;
 	// Reject the collision if:
-	return (
-		// They are in the same non-zero group.
-		(a.group != 0 && a.group == b.group) ||
-		// One of the category/mask combinations fails.
-		(a.categories & b.mask) == 0 ||
-		(b.categories & a.mask) == 0
-	);
+	// One of the category/mask combinations fails.
+
+	return  (categoryA & maskB) == 0 ||
+			(categoryB & maskA) == 0;
+}
+
+static inline cpBool
+cpBodyFilterReject2(const cpBody* a, cpBitmask mask)
+{
+	int categoryA = a->category | a->collisionMask;
+
+	// Reject the collision if:
+	return (categoryA & mask) == 0;
 }
 
 void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
@@ -318,6 +345,47 @@ cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type)
 {
 	return (type == CP_BODY_TYPE_STATIC ? space->staticBodies : space->dynamicBodies);
 }
+
+static inline void
+cpSpaceCallPostSolveFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+
+	if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
+		!cpBodyCanContact(arb->a->body, arb->b->body))
+		return;
+	
+	handler->postSolveFunc(arb, space, handler->userData);
+}
+
+static inline void
+cpSpaceCallSeparateFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+
+	if (!cpBodyCanContact(arb->body_a, arb->body_b))
+		return;
+	
+	handler->separateFunc(arb, space, handler->userData);
+}
+
+static inline void cpSpaceCallBeginFunc(cpSpace *space, cpArbiter *arb)
+{
+	cpCollisionHandler *handler = arb->handler;
+	const cpBody * bodyA = arb->a->body;
+	const cpBody * bodyB = arb->b->body;
+
+	if (cpBodyCanCollide(bodyA, bodyB)) {
+		return;
+	}
+
+	if(handler->beginFunc(arb, space, handler->userData)){
+		arb->state = CP_ARBITER_STATE_FIRST_COLLISION;
+	} else {
+		arb->state = CP_ARBITER_STATE_IGNORE;
+	}
+}
+
 
 void cpShapeUpdateFunc(cpShape *shape, void *unused);
 cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space);

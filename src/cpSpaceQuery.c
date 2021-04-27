@@ -26,7 +26,7 @@
 struct PointQueryContext {
 	cpVect point;
 	cpFloat maxDistance;
-	cpShapeFilter filter;
+	cpBitmask mask;
 	cpSpacePointQueryFunc func;
 };
 
@@ -34,7 +34,7 @@ static cpCollisionID
 NearestPointQuery(struct PointQueryContext *context, cpShape *shape, cpCollisionID id, void *data)
 {
 	if(
-		!cpShapeFilterReject(shape->filter, context->filter)
+		!cpBodyFilterReject2(shape->body, context->mask)
 	){
 		cpPointQueryInfo info;
 		cpShapePointQuery(shape, context->point, &info);
@@ -46,9 +46,9 @@ NearestPointQuery(struct PointQueryContext *context, cpShape *shape, cpCollision
 }
 
 void
-cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryFunc func, void *data)
+cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpBitmask mask, cpSpacePointQueryFunc func, void *data)
 {
-	struct PointQueryContext context = {point, maxDistance, filter, func};
+	struct PointQueryContext context = {point, maxDistance, mask, func};
 	cpBB bb = cpBBNewForCircle(point, cpfmax(maxDistance, 0.0f));
 	
 	cpSpaceLock(space); {
@@ -61,7 +61,7 @@ static cpCollisionID
 NearestPointQueryNearest(struct PointQueryContext *context, cpShape *shape, cpCollisionID id, cpPointQueryInfo *out)
 {
 	if(
-		!cpShapeFilterReject(shape->filter, context->filter) && !shape->sensor
+		!cpBodyFilterReject2(shape->body, context->mask) && !shape->sensor
 	){
 		cpPointQueryInfo info;
 		cpShapePointQuery(shape, context->point, &info);
@@ -73,7 +73,7 @@ NearestPointQueryNearest(struct PointQueryContext *context, cpShape *shape, cpCo
 }
 
 cpShape *
-cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpPointQueryInfo *out)
+cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpBitmask mask, cpPointQueryInfo *out)
 {
 	cpPointQueryInfo info = {NULL, cpvzero, maxDistance, cpvzero};
 	if(out){
@@ -84,7 +84,7 @@ cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpSh
 	
 	struct PointQueryContext context = {
 		point, maxDistance,
-		filter,
+		mask,
 		NULL
 	};
 	
@@ -101,7 +101,7 @@ cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpSh
 struct SegmentQueryContext {
 	cpVect start, end;
 	cpFloat radius;
-	cpShapeFilter filter;
+	cpBitmask mask;
 	cpSpaceSegmentQueryFunc func;
 };
 
@@ -111,7 +111,7 @@ SegmentQuery(struct SegmentQueryContext *context, cpShape *shape, void *data)
 	cpSegmentQueryInfo info;
 	
 	if(
-		!cpShapeFilterReject(shape->filter, context->filter) &&
+		!cpBodyFilterReject2(shape->body, context->mask) &&
 		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info)
 	){
 		context->func(shape, info.point, info.normal, info.alpha, data);
@@ -121,12 +121,12 @@ SegmentQuery(struct SegmentQueryContext *context, cpShape *shape, void *data)
 }
 
 void
-cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryFunc func, void *data)
+cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpBitmask mask, cpSpaceSegmentQueryFunc func, void *data)
 {
 	struct SegmentQueryContext context = {
 		start, end,
 		radius,
-		filter,
+		mask,
 		func,
 	};
 	
@@ -142,7 +142,7 @@ SegmentQueryFirst(struct SegmentQueryContext *context, cpShape *shape, cpSegment
 	cpSegmentQueryInfo info;
 	
 	if(
-		!cpShapeFilterReject(shape->filter, context->filter) && !shape->sensor &&
+		!cpBodyFilterReject2(shape->body, context->mask) && !shape->sensor &&
 		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info) &&
 		info.alpha < out->alpha
 	){
@@ -153,7 +153,7 @@ SegmentQueryFirst(struct SegmentQueryContext *context, cpShape *shape, cpSegment
 }
 
 cpShape *
-cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSegmentQueryInfo *out)
+cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpBitmask mask, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info = {NULL, end, cpvzero, 1.0f};
 	if(out){
@@ -165,7 +165,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radiu
 	struct SegmentQueryContext context = {
 		start, end,
 		radius,
-		filter,
+		mask,
 		NULL
 	};
 	
@@ -179,7 +179,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radiu
 
 struct BBQueryContext {
 	cpBB bb;
-	cpShapeFilter filter;
+	cpBitmask mask;
 	cpSpaceBBQueryFunc func;
 };
 
@@ -187,7 +187,7 @@ static cpCollisionID
 BBQuery(struct BBQueryContext *context, cpShape *shape, cpCollisionID id, void *data)
 {
 	if(
-		!cpShapeFilterReject(shape->filter, context->filter) &&
+		!cpBodyFilterReject2(shape->body, context->mask) &&
 		cpBBIntersects(context->bb, shape->bb)
 	){
 		context->func(shape, data);
@@ -197,13 +197,13 @@ BBQuery(struct BBQueryContext *context, cpShape *shape, cpCollisionID id, void *
 }
 
 void
-cpSpaceBBQuery(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryFunc func, void *data)
+cpSpaceBBQuery(cpSpace *space, cpBB bb, cpBitmask mask, cpSpaceBBQueryFunc func, void *data)
 {
-	struct BBQueryContext context = {bb, filter, func};
+	struct BBQueryContext context = {bb, mask, func};
 	
 	cpSpaceLock(space); {
-    cpSpatialIndexQuery(space->dynamicShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
-    cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
+	cpSpatialIndexQuery(space->dynamicShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
+	cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
 	} cpSpaceUnlock(space, cpTrue);
 }
 
@@ -219,7 +219,7 @@ struct ShapeQueryContext {
 static cpCollisionID
 ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
 {
-	if(cpShapeFilterReject(a->filter, b->filter) || a == b) return id;
+	if(a == b || cpBodyFilterReject(a->body, b->body)) return id;
 	
 	cpContactPointSet set = cpShapesCollide(a, b);
 	if(set.count){

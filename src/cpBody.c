@@ -59,6 +59,10 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	
 	body->userData = NULL;
 	body->type = CP_BODY_TYPE_DYNAMIC;
+
+	body->category = CP_ALL_CATEGORIES;
+	body->contactMask = 0;
+	body->collisionMask = CP_ALL_CATEGORIES;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, mass);
@@ -148,7 +152,7 @@ cpBodyGetType(const cpBody *body)
 void
 cpBodySetType(cpBody *body, cpBodyType type)
 {
-	cpBodyType oldType = cpBodyGetType(body);
+	cpBodyType oldType = _cpBodyGetType(body);
 	if(oldType == type)
 		return;
 
@@ -202,13 +206,47 @@ cpBodySetType(cpBody *body, cpBodyType type)
 	}
 }
 
+cpBitmask
+cpBodyGetCategory(const cpBody *body)
+{
+	return body->category;
+}
 
+void
+cpBodySetCategory(cpBody *body, cpBitmask category)
+{
+	body->category = category;
+}
+
+cpBitmask
+cpBodyGetContactMask(const cpBody *body)
+{
+	return body->contactMask;
+}
+
+void
+cpBodySetContactMask(cpBody *body, cpBitmask contactMask)
+{
+	body->contactMask = contactMask;
+}
+
+cpBitmask
+cpBodyGetCollisionMask(const cpBody *body)
+{
+	return body->collisionMask;
+}
+
+void
+cpBodySetCollisionMask(cpBody *body, cpBitmask collisionMask)
+{
+	body->collisionMask = collisionMask;
+}
 
 // Should *only* be called when shapes with mass info are modified, added or removed.
 void
 cpBodyAccumulateMassFromShapes(cpBody *body)
 {
-	if(body == NULL || cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) return;
+	if(body == NULL || _cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) return;
 	
 	// Reset the body's mass data.
 	body->m = body->i = 0.0f;
@@ -255,7 +293,7 @@ cpBodyGetMass(const cpBody *body)
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "You cannot set the mass of kinematic or static bodies.");
+	cpAssertHard(_cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "You cannot set the mass of kinematic or static bodies.");
 	cpAssertHard(0.0f <= mass && mass < INFINITY, "Mass must be positive and finite.");
 	
 	cpBodyActivate(body);
@@ -320,7 +358,7 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   shape->prev = NULL;
   shape->next = NULL;
 	
-	if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC && shape->massInfo.m > 0.0f){
+	if(_cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC && shape->massInfo.m > 0.0f){
 		cpBodyAccumulateMassFromShapes(body);
 	}
 }
@@ -547,7 +585,7 @@ void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
 	// Skip kinematic bodies.
-	if(cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC) return;
+	if(_cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC) return;
 	
 	cpAssertSoft(body->m > 0.0f && body->i > 0.0f, "Body's mass and moment must be positive to simulate. (Mass: %f Moment: %f)", body->m, body->i);
 	
@@ -620,7 +658,7 @@ cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point)
 void 
 cpBodyApplyTorque(cpBody *body, cpFloat torque)
 {
-	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
+	if(_cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
 		return;
 
 	cpBodyActivate(body);
@@ -631,7 +669,7 @@ cpBodyApplyTorque(cpBody *body, cpFloat torque)
 void 
 cpBodyApplyAngularImpulse(cpBody *body, cpFloat impulse)
 {
-	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
+	if(_cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) 
 		return;
 	
 	cpBodyActivate(body);
@@ -710,6 +748,7 @@ void
 cpBodyGetUserDataContactedBodies(const cpBody *body, void **userDataArray)
 {
 	cpArray *bodies = body->contactedBodies;
+
 	for(int i=0; i<bodies->num; i++){
 		*userDataArray = ((cpBody *)bodies->arr[i])->userData;
 		userDataArray++;
@@ -722,6 +761,9 @@ cpBodyContactWith(const cpBody *bodyA, const cpBody *bodyB)
 	const cpArray* bodiesA = bodyA->contactedBodies;
 	const cpArray* bodiesB = bodyB->contactedBodies;
 
+	if (bodiesA->num == 0 || bodiesB->num == 0)
+		return cpFalse;
+	
 	if (bodiesB->num < bodiesA->num){
 		return cpArrayContains(bodiesB, (void *)bodyA);
 	}
