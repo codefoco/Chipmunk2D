@@ -156,34 +156,27 @@ static inline cpBodyType _cpBodyGetType(const cpBody* body)
 
 static inline cpBool cpBodyCanContact(const cpBody* bodyA, const cpBody* bodyB)
 {
-		return  (bodyA->contactMask & bodyB->category) != 0 ||
-				(bodyA->category    & bodyB->contactMask) != 0;
+		return (bodyB->category & bodyA->contactMask) != 0 ||
+		       (bodyA->category & bodyB->contactMask) != 0;
 }
 
 static inline cpBool cpBodyCanCollide(const cpBody* bodyA, const cpBody* bodyB)
 {
-		return  (bodyA->collisionMask & bodyB->category) != 0 ||
-				(bodyA->category      & bodyB->collisionMask) != 0;
+		return (bodyB->category & bodyA->collisionMask) != 0 ||
+		       (bodyA->category & bodyB->collisionMask) != 0;
 }
 
 static inline cpBool
 cpBodyFilterReject(const cpBody* a, const cpBody* b)
 {
-	int categoryA = a->category    | a->collisionMask;
-	int maskA     = a->contactMask | a->collisionMask;
-	int categoryB = b->category    | b->collisionMask;
-	int maskB     = b->contactMask | b->collisionMask;
-	// Reject the collision if:
-	// One of the category/mask combinations fails.
-
-	return  (categoryA & maskB) == 0 ||
-			(categoryB & maskA) == 0;
+	return !cpBodyCanCollide(a, b) && 
+	       !cpBodyCanContact(a, b);
 }
 
 static inline cpBool
 cpBodyFilterReject2(const cpBody* a, cpBitmask mask)
 {
-	int categoryA = a->category | a->collisionMask;
+	int categoryA = a->collisionMask | a->contactMask;
 
 	// Reject the collision if:
 	return (categoryA & mask) == 0;
