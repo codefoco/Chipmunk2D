@@ -245,21 +245,20 @@ void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 	(*b) = shape_b->body;
 }
 
-cpBool
+void
 cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
-	return handler->beginFunc(arb, space, handler->userData);
+	handler->beginFunc(arb, space, handler->userData);
 }
 
-cpBool
+void
 cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	cpBool retval = handler->beginFunc(arb, space, handler->userData);
+	handler->beginFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
-	return retval;
 }
 
 cpBool

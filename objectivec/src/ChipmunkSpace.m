@@ -178,7 +178,7 @@ getter(cpFloat, currentTimeStep, CurrentTimeStep);
 - (ChipmunkBody *)staticBody {return _staticBody;}
 
 typedef BOOL (*BeginProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
-static bool Begin(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return ((BeginProto)objc_msgSend)(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
+static void Begin(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return ((BeginProto)objc_msgSend)(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
 
 typedef BOOL (*PreSolveProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
 static bool PreSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return ((PreSolveProto)objc_msgSend)(ctx->delegate, ctx->preSolveSelector, arb, ctx->space);}

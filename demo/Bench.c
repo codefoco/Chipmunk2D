@@ -378,10 +378,8 @@ static cpSpace *init_BouncyTerrainHexagons_500(void){
 
 // No collisions
 
-static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
+static void NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 	abort();
-	
-	return cpTrue;
 }
 
 

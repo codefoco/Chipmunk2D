@@ -120,10 +120,10 @@ CP_EXPORT cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 
 /// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
+CP_EXPORT void cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
 /// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
+CP_EXPORT void cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
 
 /// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.

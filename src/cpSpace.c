@@ -64,12 +64,11 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 
 // Default collision functions.
 
-static cpBool
+static void
 DefaultBegin(cpArbiter *arb, cpSpace *space, void *data){
 	(void)(data);
-	cpBool retA = cpArbiterCallWildcardBeginA(arb, space);
-	cpBool retB = cpArbiterCallWildcardBeginB(arb, space);
-	return retA && retB;
+	cpArbiterCallWildcardBeginA(arb, space);
+	cpArbiterCallWildcardBeginB(arb, space);
 }
 
 static cpBool
@@ -119,7 +118,7 @@ static void DoNothing(cpArbiter *arb, cpSpace *space, void *data)
 
 cpCollisionHandler cpCollisionHandlerDoNothing = {
 	CP_WILDCARD_COLLISION_TYPE, CP_WILDCARD_COLLISION_TYPE,
-	AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL
+	DoNothing, AlwaysCollide, DoNothing, DoNothing, NULL
 };
 
 // function to get the estimated velocity of a shape for the cpBBTree.
@@ -438,7 +437,7 @@ cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 	cpSpaceUseWildcardDefaultHandler(space);
 	cpCollisionType collision = CP_WILDCARD_COLLISION_TYPE;
 	cpHashValue hash = CP_HASH_PAIR(type, collision);
-	cpCollisionHandler handler = {type, CP_WILDCARD_COLLISION_TYPE, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+	cpCollisionHandler handler = {type, CP_WILDCARD_COLLISION_TYPE, DoNothing, AlwaysCollide, DoNothing, DoNothing, NULL};
 	return (cpCollisionHandler*)cpHashSetInsert(space->collisionHandlers, hash, &handler, (cpHashSetTransFunc)handlerSetTrans, NULL);
 }
 

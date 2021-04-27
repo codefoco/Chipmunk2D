@@ -379,11 +379,8 @@ static inline void cpSpaceCallBeginFunc(cpSpace *space, cpArbiter *arb)
 		return;
 	}
 
-	if(handler->beginFunc(arb, space, handler->userData)){
-		arb->state = CP_ARBITER_STATE_FIRST_COLLISION;
-	} else {
-		arb->state = CP_ARBITER_STATE_IGNORE;
-	}
+	arb->state = CP_ARBITER_STATE_IGNORE;
+	handler->beginFunc(arb, space, handler->userData);
 }
 
 

@@ -63,7 +63,7 @@ AttachHook(cpSpace *space, cpBody *hook, cpBody *crate)
 }
 
 
-static cpBool
+static void
 HookCrate(cpArbiter *arb, cpSpace *space, void *data)
 {
 	if(hookJoint == NULL){
@@ -77,8 +77,6 @@ HookCrate(cpArbiter *arb, cpSpace *space, void *data)
 		// Use the hook as the key and pass along the arbiter.
 		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)AttachHook, hook, crate);
 	}
-	
-	return cpTrue; // return value is ignored for sensor callbacks anyway
 }
 
 

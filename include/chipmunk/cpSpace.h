@@ -25,9 +25,9 @@
 //MARK: Definitions
 
 /// Collision begin event function callback type.
-/// Returning false from a begin callback causes the collision to be ignored until
+/// Begin will be called for bodies that CONTACT but not COLLIDE (according to the CollideMask value)
 /// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
+typedef void (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision pre-solve event function callback type.
 /// Returning false from a pre-step callback causes the collision to be ignored until the next step.
 typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
