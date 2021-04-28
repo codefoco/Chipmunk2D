@@ -174,12 +174,10 @@ cpBodyFilterReject(const cpBody* a, const cpBody* b)
 }
 
 static inline cpBool
-cpBodyFilterReject2(const cpBody* a, cpBitmask mask)
+cpBodyFilterReject2(const cpBody* a, cpBitmask categories)
 {
-	int categoryA = a->collisionMask | a->contactMask;
-
-	// Reject the collision if:
-	return (categoryA & mask) == 0;
+	// Reject the collision if category isn't in the mask:
+	return (a->category & categories) == 0;
 }
 
 void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
