@@ -145,6 +145,7 @@ cpSpaceInit(cpSpace *space)
 {
 #ifndef NDEBUG
 	static cpBool done = cpFalse;
+	#error Remove this line to build in Debug
 	if(!done){
 		printf("Initializing cpSpace - Chipmunk v%s (Debug Enabled)\n", cpVersionString);
 		printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");

@@ -570,13 +570,13 @@ cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc)
 }
 
 cpBodyVelocityFunc 
-cpBodyGetDefaultVelocityUpdateFunc()
+cpBodyGetDefaultVelocityUpdateFunc(void)
 {
 	return cpBodyUpdateVelocity;
 }
 
 cpBodyPositionFunc 
-cpBodyGetDefaultPositionUpdateFunc()
+cpBodyGetDefaultPositionUpdateFunc(void)
 {
 	return cpBodyUpdatePosition;
 }
