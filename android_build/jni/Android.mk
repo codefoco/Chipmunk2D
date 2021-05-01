@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES += ../include 
 LOCAL_MODULE    := chipmunk
-LOCAL_CFLAGS    := -I../include
+LOCAL_CFLAGS    := -I../include -DNDEBUG
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)

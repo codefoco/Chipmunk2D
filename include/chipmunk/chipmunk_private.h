@@ -162,7 +162,7 @@ static inline cpBool cpBodyCanContact(const cpBody* bodyA, const cpBody* bodyB)
 
 static inline cpBool cpBodyCanCollide(const cpBody* bodyA, const cpBody* bodyB)
 {
-		return (bodyB->category & bodyA->collisionMask) != 0 ||
+		return (bodyB->category & bodyA->collisionMask) != 0 &&
 		       (bodyA->category & bodyB->collisionMask) != 0;
 }
 

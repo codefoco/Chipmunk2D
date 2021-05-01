@@ -59,3 +59,6 @@ win-arm/*
 win-arm64/*
 linux-x64/*
 osx
+ios_build/ios
+ios_build/tvos
+ios_build/watchos
