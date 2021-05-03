@@ -156,14 +156,13 @@ static inline cpBodyType _cpBodyGetType(const cpBody* body)
 
 static inline cpBool cpBodyCanContact(const cpBody* bodyA, const cpBody* bodyB)
 {
-		return (bodyB->category & bodyA->contactMask) != 0 ||
-		       (bodyA->category & bodyB->contactMask) != 0;
+		return (bodyA->category & bodyB->contactMask) != 0 ||
+		       (bodyB->category & bodyA->contactMask) != 0;
 }
 
 static inline cpBool cpBodyCanCollide(const cpBody* bodyA, const cpBody* bodyB)
 {
-		return (bodyB->category & bodyA->collisionMask) != 0 &&
-		       (bodyA->category & bodyB->collisionMask) != 0;
+		return (bodyA->category & bodyB->collisionMask) != 0;
 }
 
 static inline cpBool
@@ -341,9 +340,14 @@ static inline void
 cpSpaceCallPostSolveFunc(cpSpace *space, cpArbiter *arb)
 {
 	cpCollisionHandler *handler = arb->handler;
+	const cpBody * bodyA;
+	const cpBody * bodyB;
+
+	bodyA = arb->a->body;
+	bodyB = arb->b->body;
 
 	if (arb->state != CP_ARBITER_STATE_FIRST_COLLISION ||
-		!cpBodyCanContact(arb->a->body, arb->b->body))
+		!cpBodyCanContact(bodyA, bodyB))
 		return;
 	
 	handler->postSolveFunc(arb, space, handler->userData);
@@ -353,8 +357,13 @@ static inline void
 cpSpaceCallSeparateFunc(cpSpace *space, cpArbiter *arb)
 {
 	cpCollisionHandler *handler = arb->handler;
+	const cpBody * bodyA;
+	const cpBody * bodyB;
 
-	if (!cpBodyCanContact(arb->body_a, arb->body_b))
+	bodyA = arb->body_a;
+	bodyB = arb->body_b;
+
+	if (!cpBodyCanContact(bodyA, bodyB))
 		return;
 	
 	handler->separateFunc(arb, space, handler->userData);
@@ -363,8 +372,11 @@ cpSpaceCallSeparateFunc(cpSpace *space, cpArbiter *arb)
 static inline void cpSpaceCallBeginFunc(cpSpace *space, cpArbiter *arb)
 {
 	cpCollisionHandler *handler = arb->handler;
-	const cpBody * bodyA = arb->a->body;
-	const cpBody * bodyB = arb->b->body;
+	const cpBody * bodyA;
+	const cpBody * bodyB;
+
+	bodyA = arb->a->body;
+	bodyB = arb->b->body;
 
 	if (cpBodyCanCollide(bodyA, bodyB)) {
 		return;
